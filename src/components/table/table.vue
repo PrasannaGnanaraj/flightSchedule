@@ -2,10 +2,13 @@
   <table class="table">
     <thead>
       <th v-for="header in headers" v-bind:key="header">{{header}}</th>
+      <th>Utilisation</th>
+      <th>edit</th>
     </thead>
     <tbody>
       <tr v-for="row in rows" v-bind:key="row[uniqueId]">
         <td v-for="col in row" v-bind:key="col">{{col}}</td>
+        <td v-on:click="handleEdit(row[uniqueId])" style="cursor:pointer">(&#x270D;</td>
       </tr>
     </tbody>
   </table>
@@ -16,6 +19,11 @@ export default {
     rows: { type: Array, default: null },
     headers: { type: Array, default: null },
     uniqueId:{type:String,default:null}
+  },
+  methods:{
+      handleEdit(uniqueId){
+          this.$emit('edit',uniqueId)
+      }
   }
 };
 </script>

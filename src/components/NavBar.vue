@@ -17,7 +17,7 @@
             </a>
             <a class="nav-link" href="#">Flight List
             </a>
-            <a class="nav-link" href="#">Flight Details
+            <a class="nav-link" href="#">Edit Flight Rotation
               <span class="sr-only">(current)</span>
             </a>
           </li>

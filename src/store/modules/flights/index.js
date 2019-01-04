@@ -1,5 +1,7 @@
 import * as types from './mutation-types';
 import get from '@/api/aircraftApi';
+import totalFlyingTime from '@/models/common_functions';
+
 export const state = {
   flightList: {
     isFetching: null,
@@ -7,9 +9,10 @@ export const state = {
     didInvalidate: null,
     data:{
         list:null,
-        headers:null
+        headers:null,
+        totalFlyingTime:null
     }
-  }
+  },
 };
 
 const actions = {
@@ -37,6 +40,7 @@ const mutations = {
   [types.RECEIVED_FLIGHTS](state, data) {
     state.flightList.data.list = data;
     state.flightList.data.headers = Object.keys(data[0]);
+    state.aircraftDetails.data.totalFlyingTime = totalFlyingTime(data)
     state.flightList.isFetching = false;
     state.flightList.fetched = true;
     state.flightList.didInvalidate = false;
@@ -53,6 +57,9 @@ const getters = {
   },
   getFlightListProperties(state){
       return state.flightList.data.headers
+  },
+  getTotalFlyingTime(state){
+      return state.totalFlyingTime;
   }
 };
 
