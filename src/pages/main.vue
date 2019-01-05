@@ -4,7 +4,9 @@
       <div class="p-2 bd-highlight">
         <aircraftList></aircraftList>
       </div>
-      <div class="p-2 flex-grow-1 bd-highlight">Flex item 2</div>
+      <div class="p-2 flex-grow-1 bd-highlight">
+        <aricraftRotation></aricraftRotation>
+      </div>
       <div class="p-2 bd-highlight">
         <flightList></flightList>
       </div>
@@ -14,11 +16,13 @@
 <script>
 import flightList from "@/components/flightList/flightList.vue";
 import aircraftList from "@/components/airCraftDetails/airCraftDetails.vue";
+import aricraftRotation from "@/components/aircraftFlightRotation/aircraftFlightRotation.vue";
 import { mapActions } from "vuex";
 export default {
   components: {
     flightList,
-    aircraftList
+    aircraftList,
+    aricraftRotation
   },
   methods: {
     ...mapActions(["fetchFlights", "fetchAircrafts"])
