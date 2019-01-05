@@ -22,6 +22,10 @@ export const state = {
       headers: null,
       pagination: { offset: 0, limit: 0, total: 0 }
     }
+  },
+  aircraftRotation: {
+    currentCarrierName: null,
+    data: {}
   }
 };
 
@@ -114,14 +118,29 @@ const mutations = {
   },
   [types.ADD_FLIGHT](state, args) {
     const { carrierName, flightObject } = args;
-    state.aircraft.data[carrierName].list.push(flightObject);
+    let aircraftFlightList = state.aircraftRotation.data[carrierName].list;
+    aircraftFlightList.push(flightObject);
+    //TODO do something about this situation
+    state.aircraftRotation.data = {
+      [carrierName]: {
+        list: aircraftFlightList,
+        utilization: common.totalFlyingTime(aircraftFlightList)
+      }
+    };
   },
   [types.REMOVE_FLIGHT](state, args) {
-    const { carrierName, flightObject } = args;
-    state.aircraft.data[carrierName].list = common.removeFromList(
-      state.aircraft.data[carrierName].list,
+    const { flightObject } = args;
+    let aircraftFlightList = common.removeFromList(
+      state.aircraftRotation.data[state.aircraftRotation.currentCarrierName]
+        .list,
       flightObject
     );
+    state.aircraftRotation.data = {
+      [state.aircraftRotation.currentCarrierName]: {
+        list: aircraftFlightList,
+        utilization: common.totalFlyingTime(aircraftFlightList)
+      }
+    };
   },
   [types.SET_FLIGHT_TOTAL_TIME](state, args) {
     const { carrierName } = args;
@@ -136,6 +155,15 @@ const mutations = {
   [types.SET_AIRCRAFT_LIST_OFFSET](state, pageNo) {
     state.aircraftList.data.pagination.offset =
       (pageNo - 1) * state.aircraftList.data.pagination.limit;
+  },
+  [types.SELECT_AIRCRAFT](state, carrier) {
+    state.aircraftRotation.currentCarrierName = carrier;
+    if (!(carrier in state.aircraftRotation.data)) {
+      state.aircraftRotation.data[carrier] = {
+        list: [],
+        utilization: 0
+      };
+    }
   }
 };
 const getters = {
@@ -147,9 +175,6 @@ const getters = {
   },
   getAircraftList(state) {
     return state.aircraftList.data.list;
-  },
-  getTotalFlyingTime(state) {
-    return state.totalFlyingTime;
   },
   getTotalFlightCount(state) {
     return state.flightList.data.pagination.total;
@@ -165,6 +190,12 @@ const getters = {
   },
   getAircraftListLimit(state) {
     return state.aircraftList.data.pagination.limit;
+  },
+  getCurrentAircraft(state) {
+    return state.aircraftRotation.currentCarrierName;
+  },
+  getAircraftCarrierData(state) {
+    return state.aircraftRotation.data;
   }
 };
 
