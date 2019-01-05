@@ -14,4 +14,6 @@ export const removeFromList = (array, element) => {
   return array.filter(el => el !== element);
 };
 
+export const FLIGHTS_ENDPOINT = "/flights";
+export const AIRCRAFT_ENDPOINT = "/aircrafts";
 export const getHeaders = rows => (rows.length > 0 ? Object.keys(rows[0]) : []);
