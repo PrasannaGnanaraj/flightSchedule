@@ -1,14 +1,17 @@
-import moment from 'moment';
-
-const totalFlyingTime = flightList => {
-  return flightList.reduce((totalTime, flight) => {
-    const arrivalTime = moment(flight.readable_arrival, 'HH:mm');
-    const departureTime = moment(flight.readable_departure, 'HH:mm');
-    const travelTime = moment.duration(arrivalTime.diff(departureTime));
-    totalTime=moment(totalTime).add(travelTime.hours(),'hours');
-    totalTime=moment(totalTime).add(travelTime.minutes(),'minutes');
-    return totalTime;
-  }, moment({ hours: 0, minute: 0 })).format("HH:mm")
+export const totalFlyingTime = flightList => {
+  return (
+    flightList.reduce((totalTime, flight) => {
+      const arrivalTime = flight.arrivalTime;
+      const departureTime = flight.departureTime;
+      const travelTime = arrivalTime - departureTime;
+      totalTime += travelTime;
+      return totalTime;
+    }, 0) / 3600
+  );
 };
 
-export default totalFlyingTime;
+export const removeFromList = (array, element) => {
+  return array.filter(el => el !== element);
+};
+
+export const getHeaders = rows => (rows.length > 0 ? Object.keys(rows[0]) : []);
