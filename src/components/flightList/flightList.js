@@ -1,31 +1,34 @@
-
-import tableComponent from '@/components/table/table.vue'
-import { mapGetters, mapActions } from 'vuex';
-import editModal from '@/components/editFlightDetails/editFlightDetails.vue'
-
+import flightDetails from "@/components/flightDetails/flightDetails.vue";
+import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
-      msg:'hey',
-      selectedFlight:null,
-      showEditModal:false
+      msg: "hey"
     };
   },
-  computed:{
-...mapGetters({flightList:'getFlightList',flightListProperties:'getFlightListProperties'})
+  computed: {
+    ...mapGetters({
+      flightList: "getFlightList",
+      flightListProperties: "getFlightListProperties",
+      count: "getTotalFlightCount",
+      pageLimit: "getFlightListLimit",
+      offset: "getTotalFlightOffset"
+    }),
+    pagnation() {
+      const totalPages = parseInt(this.count / this.pageLimit);
+      return totalPages ? totalPages : 0;
+    }
   },
-  components:{
-    tableComponent,
-    editModal
+  components: {
+    flightDetails
   },
   methods: {
-      ...mapActions(['fetchFlights']),
-      handleEditRequest(uniqueId){
-          this.selectedFlight = this.flightList.find((flight)=>flight.ident===uniqueId)
-          this.showEditModal = true;
-      }
-  },
-  mounted() {
-      this.fetchFlights();
+    ...mapActions(["fetchFlights"]),
+    setActive(id) {
+      return id === this.offset / 25 + 1;
+    },
+    handlePageNoClick(page) {
+      this.fetchFlights(page);
+    }
   }
 };
