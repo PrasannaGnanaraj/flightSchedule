@@ -10,8 +10,7 @@ export const state = {
     data: {
       list: null,
       headers: null,
-      offset: 0,
-      limit: 0
+      pagination: { offset: 0, limit: 0, total: 0 }
     }
   },
   aircraftList: {
@@ -21,20 +20,23 @@ export const state = {
     data: {
       list: null,
       headers: null,
-      offset: 0,
-      limit: 0
+      pagination: { offset: 0, limit: 0, total: 0 }
     }
   }
 };
 
 const actions = {
-  fetchFlights({ commit, state }, args = {}) {
-    commit(types.SET_FLIGHT_LIST_OFFSET, args);
+  fetchFlights({ commit, state }, pageNo = 1) {
+    commit(types.SET_FLIGHT_LIST_OFFSET, pageNo);
     commit(types.REQUEST_FLIGHTS);
     return new Promise((resolve, reject) => {
-      get(`${common.FLIGHTS_ENDPOINT}?offset=${state.flightList.data.offset}`)
-        .then(({ data }) => {
-          commit(types.RECEIVED_FLIGHTS, data);
+      get(
+        `${common.FLIGHTS_ENDPOINT}?offset=${
+          state.flightList.data.pagination.offset
+        }`
+      )
+        .then(res => {
+          commit(types.RECEIVED_FLIGHTS, res);
           resolve("success");
         })
         .catch(e => {
@@ -43,15 +45,17 @@ const actions = {
         });
     });
   },
-  fetchAircrafts({ commit, state }, args = {}) {
-    commit(types.SET_AIRCRAFT_LIST_OFFSET, args);
+  fetchAircrafts({ commit, state }, pageNo = 1) {
+    commit(types.SET_AIRCRAFT_LIST_OFFSET, pageNo);
     commit(types.REQUEST_AIRCRAFTS);
     return new Promise((resolve, reject) => {
       get(
-        `${common.AIRCRAFT_ENDPOINT}?offset=${state.aircraftList.data.offset}`
+        `${common.AIRCRAFT_ENDPOINT}?offset=${
+          state.aircraftList.data.pagination.offset
+        }`
       )
-        .then(({ data }) => {
-          commit(types.RECEIVED_AIRCRAFTS, data);
+        .then(res => {
+          commit(types.RECEIVED_AIRCRAFTS, res);
           resolve("success");
         })
         .catch(e => {
@@ -75,8 +79,10 @@ const mutations = {
     state.flightList.fetched = false;
     state.flightList.didInvalidate = false;
   },
-  [types.RECEIVED_FLIGHTS](state, data) {
+  [types.RECEIVED_FLIGHTS](state, res) {
+    const { data, pagination } = res;
     state.flightList.data.list = data;
+    state.flightList.data.pagination = pagination;
     state.flightList.data.headers = Object.keys(data[0]);
     state.flightList.isFetching = false;
     state.flightList.fetched = true;
@@ -92,8 +98,10 @@ const mutations = {
     state.aircraftList.fetched = false;
     state.aircraftList.didInvalidate = false;
   },
-  [types.RECEIVED_AIRCRAFTS](state, data) {
+  [types.RECEIVED_AIRCRAFTS](state, res) {
+    const { data, pagination } = res;
     state.aircraftList.data.list = data;
+    state.aircraftList.data.pagination = pagination;
     state.aircraftList.data.headers = Object.keys(data[0]);
     state.aircraftList.isFetching = false;
     state.aircraftList.fetched = true;
@@ -121,21 +129,13 @@ const mutations = {
       state.aircraft.data[carrierName].list
     );
   },
-  [types.SET_FLIGHT_LIST_OFFSET](state, args) {
-    const { prev = null, next = null } = args;
-    if (prev) {
-      state.flightList.data.offset += state.flightList.data.limit;
-    } else if (next) {
-      state.flightList.data.offset -= state.flightList.data.limit;
-    }
+  [types.SET_FLIGHT_LIST_OFFSET](state, pageNo) {
+    state.flightList.data.pagination.offset =
+      (pageNo - 1) * state.flightList.data.pagination.limit;
   },
-  [types.SET_AIRCRAFT_LIST_OFFSET](state, args) {
-    const { prev = null, next = null } = args;
-    if (prev) {
-      state.aircraftList.data.offset += state.aircraftList.data.limit;
-    } else if (next) {
-      state.aircraftList.data.offset -= state.aircraftList.data.limit;
-    }
+  [types.SET_AIRCRAFT_LIST_OFFSET](state, pageNo) {
+    state.aircraftList.data.pagination.offset =
+      (pageNo - 1) * state.aircraftList.data.pagination.limit;
   }
 };
 const getters = {
@@ -145,8 +145,26 @@ const getters = {
   getFlightListProperties(state) {
     return state.flightList.data.headers;
   },
+  getAircraftList(state) {
+    return state.aircraftList.data.list;
+  },
   getTotalFlyingTime(state) {
     return state.totalFlyingTime;
+  },
+  getTotalFlightCount(state) {
+    return state.flightList.data.pagination.total;
+  },
+  getTotalFlightOffset(state) {
+    return state.flightList.data.pagination.offset;
+  },
+  getTotalAircraftCount(state) {
+    return state.aircraftList.data.pagination.total;
+  },
+  getFlightListLimit(state) {
+    return state.flightList.data.pagination.limit;
+  },
+  getAircraftListLimit(state) {
+    return state.aircraftList.data.pagination.limit;
   }
 };
 
