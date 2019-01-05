@@ -1,8 +1,8 @@
 export const totalFlyingTime = flightList => {
   return (
     flightList.reduce((totalTime, flight) => {
-      const arrivalTime = flight.arrivalTime;
-      const departureTime = flight.departureTime;
+      const arrivalTime = flight.arrivaltime;
+      const departureTime = flight.departuretime;
       const travelTime = arrivalTime - departureTime;
       totalTime += travelTime;
       return totalTime;
