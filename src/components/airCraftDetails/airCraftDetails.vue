@@ -2,7 +2,7 @@
   <div>
     <h5>Available Aircrafts</h5>
     <div
-      :class="{card:'true','bg-primary':setActive(aircraft.ident),'text-white':setActive(aircraft.ident)}"
+      :class="{card:'true','bg-primary':setActive(aircraft.ident),'text-white':setActive(aircraft.ident),'bg-danger':setFull(aircraft.ident)}"
       v-for="aircraft in aircraftList"
       v-bind:key="aircraft.ident"
       style="width:10em"
@@ -27,7 +27,14 @@
           <div
             class="progress-bar progress-bar-striped bg-success"
             role="progressbar"
-            :style="{width:`${(aircraftCarrierData[currentAircraft].utilization/24)*100}%`}"
+            :style="{width:`${(utilization[0]/24)*100}%`}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          ></div>
+          <div
+            class="progress-bar progress-bar-striped"
+            role="progressbar"
+            :style="{width:`${(utilization[1]/24)*100}%`,'background-color':'purple'}"
             aria-valuemin="0"
             aria-valuemax="100"
           ></div>
@@ -45,14 +52,30 @@ export default {
       aircraftList: "getAircraftList",
       currentAircraft: "getCurrentAircraft",
       aircraftCarrierData: "getAircraftCarrierData"
-    })
+    }),
+    utilization: {
+      get() {
+        return this.$store.state.flights.aircraftRotation.data[
+          this.currentAircraft
+        ].utilization;
+      }
+    }
   },
   methods: {
     handleAircraftClick(id) {
       this.$store.commit(mutation.SELECT_AIRCRAFT, id);
     },
     setActive(id) {
-      return id === this.currentAircraft;
+      if (id === this.currentAircraft) {
+        return this.utilization[0] + this.utilization[1] > 24 ? false : true;
+      }
+      return false;
+    },
+    setFull(id) {
+      if (id === this.currentAircraft) {
+        return this.utilization[0] + this.utilization[1] > 24 ? true : false;
+      }
+      return false;
     }
   }
 };

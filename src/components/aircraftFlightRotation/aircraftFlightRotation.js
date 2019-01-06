@@ -14,7 +14,18 @@ export default {
     ...mapGetters({
       aircraftCarrierData: "getAircraftCarrierData",
       currentAircraft: "getCurrentAircraft"
-    })
+    }),
+    flightIds: {
+      get() {
+        if (this.currentAircraft) {
+          return this.$store.state.flights.aircraftRotation.data[
+            this.currentAircraft
+          ].list.map(flight => flight.ident);
+        } else {
+          return [];
+        }
+      }
+    }
   },
   methods: {
     handleDrop(event) {
@@ -22,8 +33,19 @@ export default {
       const flightObject = JSON.parse(event.dataTransfer.getData("text"));
       if (this.currentAircraft) {
         const carrierName = this.currentAircraft;
-        this.$store.commit(ADD_FLIGHT, { carrierName, flightObject });
+        if (
+          !this.checkIfDuplicate(flightObject) &&
+          !this.checkIfOverNightFlight(flightObject)
+        ) {
+          this.$store.commit(ADD_FLIGHT, { carrierName, flightObject });
+        }
       }
+    },
+    checkIfDuplicate(flightObject) {
+      return this.flightIds.includes(flightObject.ident);
+    },
+    checkIfOverNightFlight(flightObject) {
+      return flightObject.departuretime > flightObject.arrivaltime;
     },
     handleDragOver(event) {
       event.preventDefault();

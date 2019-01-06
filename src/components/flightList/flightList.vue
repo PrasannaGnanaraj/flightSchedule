@@ -2,9 +2,17 @@
   <div>
     <h5>Available Flights</h5>
     <div style="overflow-y:scroll;height:75vh">
-      <flightDetails v-for="flight in flightList" :flightDetails="flight" v-bind:key="flight.ident"></flightDetails>
+      <transition-group name="list">
+        <flightDetails
+          v-for="flight in flightList"
+          :enableIcons="true"
+          :disableDescription="true"
+          :flightDetails="flight"
+          :flightIds="flightIds"
+          v-bind:key="flight.ident"
+        ></flightDetails>
+      </transition-group>
     </div>
-
     <nav>
       <ul class="pagination">
         <li

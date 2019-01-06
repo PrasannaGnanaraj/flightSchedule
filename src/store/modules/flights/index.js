@@ -124,7 +124,10 @@ const mutations = {
     state.aircraftRotation.data = {
       [carrierName]: {
         list: aircraftFlightList,
-        utilization: common.totalFlyingTime(aircraftFlightList)
+        utilization: [
+          common.totalFlyingTime(aircraftFlightList),
+          common.totalTurnAroundTime(aircraftFlightList)
+        ]
       }
     };
   },
@@ -138,7 +141,10 @@ const mutations = {
     state.aircraftRotation.data = {
       [state.aircraftRotation.currentCarrierName]: {
         list: aircraftFlightList,
-        utilization: common.totalFlyingTime(aircraftFlightList)
+        utilization: [
+          common.totalFlyingTime(aircraftFlightList),
+          common.totalTurnAroundTime(aircraftFlightList)
+        ]
       }
     };
   },
@@ -161,7 +167,7 @@ const mutations = {
     if (!(carrier in state.aircraftRotation.data)) {
       state.aircraftRotation.data[carrier] = {
         list: [],
-        utilization: 0
+        utilization: [0, 0]
       };
     }
   }
